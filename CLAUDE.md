@@ -21,7 +21,7 @@ model (daydream-chess-nanogpt, NOT BUILT)  →  engine (server/, Python)  →  u
 ```
 
 The three parts are coupled **only** through the **turn record**, carried over a WebSocket message
-protocol. **This contract is frozen.** Read `agent_docs/architecture.md` before changing anything that
+protocol. **This contract is frozen.** Read `docs/architecture.md` before changing anything that
 crosses the seam. The UI must never reach into engine internals, and the engine must never assume how
 the UI renders.
 
@@ -32,9 +32,9 @@ the UI renders.
   `app.py` (FastAPI `/ws`), `demo.py` (headless self-game), `test_engine.py`.
 - `web/` — React 19 + Vite frontend. Frontend conventions live in `web/CLAUDE.md`. The animation
   engine and orchestration are in `web/src/App.jsx`; demo-mode fixtures in `web/src/lib/`.
-- `docs/Plan.md` — the design runbook: the WHY, and the **locked decisions**. Read it before
-  proposing architectural changes; do not re-litigate anything marked locked.
-- `agent_docs/` — operational how-to (read the relevant file before working):
+- `docs/` — design and operational docs (read the relevant file before working):
+  - `Plan.md` — the design runbook: the WHY, and the **locked decisions**. Read before proposing
+    architectural changes; do not re-litigate anything marked locked.
   - `architecture.md` — the frozen seam: WebSocket protocol, turn-record schema, render tiers.
   - `running.md` — run, test, and verify each half and the full stack; how to swap in the real model.
 
@@ -50,7 +50,7 @@ Python deps live in a venv at `.venv` (use `.venv/bin/python`, `.venv/bin/uvicor
   on `:8080` connected live. Ctrl-C stops both; `OPEN=0 ./run.sh` skips opening the browser.
 
 When you change anything on the seam, verify it with a real WebSocket round-trip, not only unit tests.
-See `agent_docs/running.md`.
+See `docs/running.md`.
 
 ## Conventions
 
