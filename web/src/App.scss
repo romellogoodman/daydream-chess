@@ -1,37 +1,31 @@
-// daydream-chess — the aesthetic IS the point.
-// A dark, dreamy palette. Dreams are dim/hazy/blurred/desaturated; the wake
-// snaps to full color and sharpness. Restrained, atmospheric, a little eerie.
+// daydream-chess — Lichess-inspired, spare. Dark page, classic brown board,
+// cburnett pieces, minimal typography. No dream/wake animation.
+//
+// Pieces: cburnett SVG set from Lichess (lila), GPL-licensed.
+// https://github.com/lichess-org/lila/tree/master/public/piece/cburnett
 
 :root {
-  // --- palette: deep night, faint moonlight ---
-  --c-void: #0a0a0f;
-  --c-night: #11121a;
-  --c-panel: #15161f;
-  --c-panel-edge: #23242f;
-  --c-ink: #e7e6ef;
-  --c-ink-soft: #a9a8bd;
-  --c-ink-faint: #6c6b82;
-  --c-mist: #8d8aa8;
+  // page
+  --c-bg: #161512;
+  --c-panel: #2b2926;
+  --c-panel-edge: #3a3633;
+  --c-ink: #bfbdb6;
+  --c-ink-soft: #8a8782;
+  --c-ink-faint: #6a6661;
 
-  // board squares — desaturated indigo/slate, not chess-green
-  --c-square-light: #2a2b3a;
-  --c-square-dark: #1c1d28;
-  --c-piece-white: #f3f1fb;
-  --c-piece-black: #8b88a8;
+  // board — classic Lichess
+  --c-square-light: #f0d9b5;
+  --c-square-dark: #b58863;
+  --c-last: rgba(155, 199, 0, 0.41); // Lichess last-move highlight
+  --c-select: rgba(20, 85, 30, 0.5);
 
-  // accents
-  --c-accent: #7c83ff; // waking / selection violet-blue
-  --c-accent-soft: #4a4f8f;
-  --c-dream: #5b6ab0; // dream halo
-  --c-warn: #c98b6b;
+  --c-accent: #629924; // Lichess green
 
-  --r-soft: 10px;
-  --r-board: 6px;
+  --r-soft: 4px;
 
   --sp-1: 8px;
   --sp-2: 16px;
   --sp-3: 24px;
-  --sp-4: 40px;
 
   --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono:
@@ -43,14 +37,7 @@
 }
 
 body {
-  background:
-    radial-gradient(
-      120% 90% at 50% -10%,
-      #181a2a 0%,
-      var(--c-void) 55%,
-      #050509 100%
-    ),
-    var(--c-void);
+  background: var(--c-bg);
   color: var(--c-ink);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
@@ -60,80 +47,62 @@ body {
 .app {
   min-height: 100vh;
   width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: var(--sp-4) var(--sp-3) var(--sp-4);
+  padding: var(--sp-3);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-
-  &__header {
-    text-align: center;
-  }
-
-  &__title {
-    font-size: clamp(1.8rem, 4vw, 2.6rem);
-    font-weight: 300;
-    letter-spacing: 0.18em;
-    text-transform: lowercase;
-    color: var(--c-ink);
-    margin: 0;
-    text-shadow: 0 0 28px rgba(124, 131, 255, 0.25);
-  }
-
-  &__subtitle {
-    margin: var(--sp-1) 0 0;
-    color: var(--c-ink-faint);
-    font-size: 0.86rem;
-    letter-spacing: 0.04em;
-    font-style: italic;
-  }
+  align-items: center; // center horizontally
+  justify-content: center; // center vertically
+  gap: var(--sp-2);
 
   &__banner {
-    align-self: center;
-    background: rgba(91, 106, 176, 0.1);
-    border: 1px solid rgba(91, 106, 176, 0.3);
-    color: var(--c-mist);
-    border-radius: 999px;
-    padding: 6px 16px;
-    font-size: 0.76rem;
-    letter-spacing: 0.05em;
+    color: var(--c-ink-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
+  // board + sidebar side by side, sized to content so they sit together
   &__layout {
     display: grid;
-    grid-template-columns: minmax(320px, 1fr) minmax(280px, 360px);
-    gap: var(--sp-4);
-    align-items: start;
+    grid-template-columns: min(560px, 70vh) 260px;
+    gap: 0; // board and sidebar sit flush
+    align-items: stretch;
 
-    @media (max-width: 880px) {
-      grid-template-columns: 1fr;
+    @media (max-width: 820px) {
+      grid-template-columns: min(560px, 92vw);
+      justify-items: center;
     }
-  }
-
-  &__stage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--sp-2);
   }
 
   &__board-wrap {
     position: relative;
     width: 100%;
-    max-width: 540px;
   }
+}
 
-  &__side {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-3);
-  }
+// --- sidebar: one panel — New game, status, move log, controls -------------
+.sidebar {
+  align-self: stretch; // match the board's height
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  background: var(--c-panel);
+  border: 1px solid var(--c-panel-edge);
+  // rounded on the outer (right) edge only; flush against the board on the left
+  border-radius: 0 var(--r-soft) var(--r-soft) 0;
+  padding: var(--sp-2);
 
-  // a faint global breathing dim while the model dreams
-  &--dreaming {
-    .app__board-wrap {
-      // handled per-board; keep shell calm
+  &__new-game {
+    background: var(--c-accent);
+    color: #fff;
+    border: 0;
+    border-radius: var(--r-soft);
+    padding: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.08);
     }
   }
 }
@@ -143,16 +112,10 @@ body {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: var(--r-board);
+  // rounded on the outer (left) edge only; flush against the sidebar on the right
+  border-radius: var(--r-soft) 0 0 var(--r-soft);
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px var(--c-panel-edge),
-    0 24px 60px -20px rgba(0, 0, 0, 0.8);
-  // the transition between dream and sharp is THE moment.
-  transition:
-    filter 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 520ms ease;
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.7);
 
   &__grid {
     position: absolute;
@@ -160,21 +123,6 @@ body {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(8, 1fr);
-  }
-
-  // veil overlay used to deepen the dream haze
-  &__veil {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(
-      80% 80% at 50% 45%,
-      rgba(40, 44, 92, 0) 0%,
-      rgba(14, 14, 28, 0.55) 100%
-    );
-    transition: opacity 480ms ease;
   }
 
   &__square {
@@ -186,11 +134,6 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: clamp(1.6rem, 6.4vw, 3rem);
-    line-height: 1;
-    transition:
-      box-shadow 180ms ease,
-      background-color 200ms ease;
 
     &--light {
       background: var(--c-square-light);
@@ -200,23 +143,18 @@ body {
     }
 
     &--selected {
-      box-shadow: inset 0 0 0 3px var(--c-accent);
+      box-shadow: inset 0 0 0 100px var(--c-select);
     }
 
-    &--dest {
-      &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        box-shadow: inset 0 0 0 2px rgba(124, 131, 255, 0.35);
-      }
-    }
-
-    &--last {
-      background-image: radial-gradient(
-        circle at center,
-        rgba(124, 131, 255, 0.14),
-        transparent 70%
+    // Lichess capture target: corner-cut ring around the piece.
+    &--capture::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        transparent 0%,
+        transparent 79%,
+        rgba(20, 85, 30, 0.3) 80%
       );
     }
 
@@ -226,130 +164,72 @@ body {
     }
   }
 
+  // last-move tint needs to sit on top of the square fill
+  &__square--last {
+    &.board__square--light {
+      background:
+        linear-gradient(var(--c-last), var(--c-last)), var(--c-square-light);
+    }
+    &.board__square--dark {
+      background:
+        linear-gradient(var(--c-last), var(--c-last)), var(--c-square-dark);
+    }
+  }
+
+  // legal-move dot on an empty target
   &__dot {
-    width: 26%;
-    height: 26%;
+    width: 30%;
+    height: 30%;
     border-radius: 50%;
-    background: rgba(124, 131, 255, 0.4);
+    background: rgba(20, 85, 30, 0.3);
+    pointer-events: none;
+  }
+
+  // minimal coordinates tinted into the corners
+  &__coord {
+    position: absolute;
+    font-size: 0.62rem;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+
+    &--file {
+      bottom: 2px;
+      right: 3px;
+    }
+    &--rank {
+      top: 2px;
+      right: 3px;
+    }
+  }
+
+  // coord color is the opposite square color, Lichess-style
+  &__square--light &__coord {
+    color: var(--c-square-dark);
+  }
+  &__square--dark &__coord {
+    color: var(--c-square-light);
   }
 
   &__piece {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
     pointer-events: none;
     user-select: none;
-    transition:
-      color 420ms ease,
-      filter 420ms ease;
-
-    &--white {
-      color: var(--c-piece-white);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    }
-    &--black {
-      color: var(--c-piece-black);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
-    }
-  }
-
-  // --- the two moods --------------------------------------------------
-  // sharp = reality, fully awake
-  &--sharp {
-    filter: none;
-    transform: none;
-  }
-
-  // dream = dim, hazy, low-contrast, desaturated, slightly blurred
-  &--dream {
-    filter: blur(2.4px) saturate(0.35) brightness(0.62) contrast(0.78);
-    transform: scale(1.012);
-    opacity: 0.9;
-
-    .board__veil {
-      opacity: 1;
-    }
-    .board__square {
-      cursor: default;
-    }
-    .board__piece {
-      // bleed the dream pieces toward a single moonlit hue
-      color: var(--c-dream) !important;
-      text-shadow: 0 0 10px rgba(91, 106, 176, 0.5);
-    }
-  }
-}
-
-// --- ghost arrow (phantom dreams) ----------------------------------------
-.ghost-arrow {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  width: 100%;
-  height: 100%;
-  animation: ghost-fade 320ms ease both;
-
-  &__line {
-    stroke: rgba(124, 131, 255, 0.55);
-    stroke-width: 0.09;
-    stroke-linecap: round;
-    stroke-dasharray: 0.18 0.16;
-    filter: drop-shadow(0 0 6px rgba(124, 131, 255, 0.6));
-  }
-
-  &__origin {
-    fill: rgba(124, 131, 255, 0.22);
-    stroke: rgba(124, 131, 255, 0.5);
-    stroke-width: 0.04;
-  }
-
-  &__head {
-    fill: rgba(124, 131, 255, 0.7);
-  }
-}
-
-@keyframes ghost-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
 // --- status line ----------------------------------------------------------
 .status-line {
-  min-height: 1.4rem;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-1);
+  margin: 0;
+  min-height: 1.2rem;
   color: var(--c-ink-soft);
-  font-size: 0.84rem;
-  letter-spacing: 0.06em;
-  font-variant: small-caps;
-
-  &--dreaming {
-    color: var(--c-mist);
-  }
-
-  &__pulse {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--c-dream);
-    box-shadow: 0 0 12px var(--c-dream);
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
 }
 
 // --- ending overlay -------------------------------------------------------
@@ -360,323 +240,136 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-board);
-  background: rgba(8, 8, 14, 0.72);
-  backdrop-filter: blur(6px);
-  animation: ending-in 700ms ease both;
-
-  &--sleep {
-    background: rgba(7, 8, 18, 0.85);
-    backdrop-filter: blur(10px) saturate(0.5);
-    animation: ending-in 1400ms ease both;
-  }
+  border-radius: var(--r-soft);
+  background: rgba(20, 19, 17, 0.78);
 
   &__card {
     text-align: center;
     padding: var(--sp-3);
-    max-width: 80%;
   }
 
   &__title {
     margin: 0;
-    font-weight: 300;
-    font-size: 1.6rem;
-    letter-spacing: 0.08em;
+    font-size: 1.2rem;
     color: var(--c-ink);
-  }
-
-  &--sleep &__title {
-    color: var(--c-mist);
-    text-shadow: 0 0 24px rgba(91, 106, 176, 0.45);
-  }
-
-  &__line {
-    margin: var(--sp-2) 0 0;
-    color: var(--c-ink-soft);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    font-style: italic;
   }
 
   &__winner {
-    margin: var(--sp-2) 0 0;
-    color: var(--c-accent);
-    letter-spacing: 0.1em;
-    font-variant: small-caps;
-  }
-
-  &__new-game {
-    margin-top: var(--sp-3);
-    background: transparent;
-    border: 1px solid var(--c-accent-soft);
-    color: var(--c-ink);
-    padding: 10px 22px;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 220ms ease;
-
-    &:hover {
-      background: rgba(124, 131, 255, 0.12);
-      border-color: var(--c-accent);
-    }
-  }
-}
-
-@keyframes ending-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-// --- controls -------------------------------------------------------------
-.controls {
-  background: var(--c-panel);
-  border: 1px solid var(--c-panel-edge);
-  border-radius: var(--r-soft);
-  padding: var(--sp-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-
-  &__group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  &__label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    margin: var(--sp-1) 0 0;
     color: var(--c-ink-soft);
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  &__value {
-    font-family: var(--font-mono);
-    color: var(--c-accent);
-    font-size: 0.95rem;
-  }
-
-  &__slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--c-accent-soft), var(--c-dream));
-    outline: none;
-    cursor: pointer;
-
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--c-ink);
-      box-shadow: 0 0 10px rgba(124, 131, 255, 0.6);
-      cursor: pointer;
-    }
-    &::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border: 0;
-      border-radius: 50%;
-      background: var(--c-ink);
-      box-shadow: 0 0 10px rgba(124, 131, 255, 0.6);
-      cursor: pointer;
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-  }
-
-  &__hint {
-    margin: 0;
-    color: var(--c-ink-faint);
-    font-size: 0.74rem;
-    font-style: italic;
+    font-size: 0.85rem;
   }
 
   &__new-game {
-    margin-top: var(--sp-1);
+    margin-top: var(--sp-2);
     background: var(--c-accent);
-    color: #0a0a12;
+    color: #fff;
     border: 0;
     border-radius: var(--r-soft);
-    padding: 11px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    padding: 8px 18px;
+    font-size: 0.82rem;
     cursor: pointer;
-    transition:
-      transform 160ms ease,
-      box-shadow 200ms ease,
-      opacity 160ms ease;
 
     &:hover {
-      box-shadow: 0 0 22px rgba(124, 131, 255, 0.45);
-      transform: translateY(-1px);
-    }
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
+      filter: brightness(1.08);
     }
   }
 }
 
-// --- game log -------------------------------------------------------------
-.game-log {
-  background: var(--c-panel);
-  border: 1px solid var(--c-panel-edge);
-  border-radius: var(--r-soft);
-  padding: var(--sp-3);
-  max-height: 540px;
-  overflow-y: auto;
+// --- params readout (footer of the sidebar; rolled each game) -------------
+.sidebar__params {
+  margin: 0;
+  margin-top: auto; // pin to the bottom of the sidebar
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--c-panel-edge);
+  color: var(--c-ink-faint);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
 
-  &__title {
-    margin: 0 0 var(--sp-2);
-    font-size: 0.78rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--c-ink-faint);
-    font-weight: 500;
-  }
+// --- move log (populates as the game runs) --------------------------------
+.log {
+  flex: 1; // fill the sidebar between status and controls
+  min-height: 120px;
+  overflow-y: auto;
+  border-top: 1px solid var(--c-panel-edge);
+  padding-top: var(--sp-1);
 
   &__empty {
+    margin: 0;
+    padding: var(--sp-1) 0;
     color: var(--c-ink-faint);
-    font-style: italic;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   &__list {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
   }
 
-  &__entry {
-    display: flex;
+  &__line {
+    display: grid;
+    grid-template-columns: 2.4em 1fr auto;
+    align-items: baseline;
     gap: var(--sp-1);
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(35, 36, 47, 0.5);
-
-    &:last-child {
-      border-bottom: 0;
-    }
-  }
-
-  &__move-no {
-    flex: 0 0 2.4em;
-    color: var(--c-ink-faint);
+    padding: 3px 2px;
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    padding-top: 2px;
   }
 
-  &__body {
-    flex: 1;
-    min-width: 0;
+  &__no {
+    color: var(--c-ink-faint);
+    text-align: right;
   }
 
-  &__uci {
-    font-family: var(--font-mono);
-    font-size: 0.92rem;
+  &__move {
     color: var(--c-ink);
   }
 
-  &__entry--model &__uci {
-    color: var(--c-accent);
-  }
-
-  &__accepted {
-    background: none;
-    border: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--sp-1);
-    cursor: default;
-    text-align: left;
-    color: inherit;
-
-    &[data-has-dreams="true"] {
-      cursor: pointer;
-    }
-  }
-
-  &__dream-badge {
-    font-size: 0.68rem;
-    color: var(--c-mist);
-    letter-spacing: 0.05em;
-    border: 1px solid rgba(91, 106, 176, 0.3);
-    border-radius: 999px;
-    padding: 1px 8px;
-    transition: all 180ms ease;
-
-    .game-log__accepted:hover & {
-      color: var(--c-ink);
-      border-color: var(--c-dream);
-    }
-  }
-
-  &__dreams {
-    list-style: none;
-    margin: 8px 0 2px;
-    padding: 0 0 0 10px;
-    border-left: 1px solid rgba(91, 106, 176, 0.3);
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    animation: dreams-in 260ms ease both;
-  }
-
-  &__dream {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  &__dream-uci {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--c-mist);
-  }
-
-  &__dream-kind {
-    font-size: 0.7rem;
+  &__who {
     color: var(--c-ink-faint);
-    font-style: italic;
+    font-family: var(--font-sans, inherit);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
   }
 
-  &__dream--phantom &__dream-uci {
-    color: var(--c-warn);
-    opacity: 0.85;
+  // pending model move: a loading row at the bottom of the log
+  &__line--pending {
+    color: var(--c-ink-soft);
+  }
+
+  &__dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--c-ink-soft);
+      opacity: 0.35;
+      animation: log-dot 1s infinite ease-in-out;
+    }
+    i:nth-child(2) {
+      animation-delay: 0.16s;
+    }
+    i:nth-child(3) {
+      animation-delay: 0.32s;
+    }
   }
 }
 
-@keyframes dreams-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
+@keyframes log-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  40% {
+    opacity: 0.9;
   }
 }
 

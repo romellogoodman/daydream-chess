@@ -1,24 +1,11 @@
 // Tiny FEN parsing + rendering helpers for daydream-chess.
 // NO move generation — the server provides legal_moves. We only parse/render.
 
-// Unicode glyphs. Keyed by FEN char (uppercase = White, lowercase = Black).
-const GLYPHS = {
-  K: "♔",
-  Q: "♕",
-  R: "♖",
-  B: "♗",
-  N: "♘",
-  P: "♙",
-  k: "♚",
-  q: "♛",
-  r: "♜",
-  b: "♝",
-  n: "♞",
-  p: "♟",
-};
-
-export function glyphFor(piece) {
-  return GLYPHS[piece] || "";
+// Map a FEN char to a cburnett SVG filename, e.g. 'K' -> 'wK', 'q' -> 'bQ'.
+export function pieceAsset(piece) {
+  if (!piece) return null;
+  const color = piece === piece.toUpperCase() ? "w" : "b";
+  return `/piece/cburnett/${color}${piece.toUpperCase()}.svg`;
 }
 
 export function colorOf(piece) {

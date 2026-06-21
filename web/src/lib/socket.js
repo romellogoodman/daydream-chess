@@ -22,8 +22,8 @@ const CONNECT_TIMEOUT_MS = 1500;
 // Replays canned fixtures with realistic timing in response to client
 // messages, so the UI is fully demoable with no server.
 
-const MOCK_TURN_DELAY_MS = 500; // pause before the model's turn_record arrives
-const MOCK_STATE_DELAY_MS = 250; // pause between successive replayed messages
+const MOCK_TURN_DELAY_MS = 120; // pause before the model's turn_record arrives
+const MOCK_STATE_DELAY_MS = 60; // pause between successive replayed messages
 
 class MockSocket {
   constructor() {

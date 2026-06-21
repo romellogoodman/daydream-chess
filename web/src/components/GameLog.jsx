@@ -1,102 +1,59 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
-// The exhibitable artifact: a running record of the real game. Each model turn
-// shows the accepted move and, collapsibly, the dreams that preceded it — the
-// moves it almost made. Labeling leans a little poetic.
+// A running move log that populates as the game goes. One line per ply:
+// "1.  e2e4  you" / "1…  e7e5  model". Newest lines stay in view.
+// TODO: SAN — converting UCI to SAN needs a chess move-gen lib we don't ship.
 
-const KIND_LABEL = {
-  wrong_board: "dreamed a board that wasn't there",
-  phantom: "reached for a piece that wasn't there",
-  woke: "woke, and played",
-};
+function GameLog({ entries, thinking, nextPly }) {
+  const scrollRef = useRef(null);
 
-function MoveNumber({ ply }) {
-  const moveNo = Math.ceil(ply / 2);
-  const isWhite = ply % 2 === 1;
-  return (
-    <span className="game-log__move-no">
-      {moveNo}
-      {isWhite ? "." : "…"}
-    </span>
-  );
-}
+  // Keep the latest move (or the pending loader) in view as the log grows.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [entries, thinking]);
 
-function DreamList({ attempts }) {
-  const dreams = attempts.filter((a) => a.kind !== "woke");
-  if (dreams.length === 0) return null;
-  return (
-    <ol className="game-log__dreams">
-      {dreams.map((a) => (
-        <li key={a.n} className={`game-log__dream game-log__dream--${a.kind}`}>
-          <span className="game-log__dream-uci">{a.uci}</span>
-          <span className="game-log__dream-kind">{KIND_LABEL[a.kind]}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function ModelEntry({ entry }) {
-  const [open, setOpen] = useState(false);
-  const dreamCount = entry.attempts.filter((a) => a.kind !== "woke").length;
-  const woke = entry.woke;
+  const empty = entries.length === 0 && !thinking;
+  const pendingNo = Math.ceil(nextPly / 2);
+  const pendingIsWhite = nextPly % 2 === 1;
 
   return (
-    <li className="game-log__entry game-log__entry--model">
-      <MoveNumber ply={entry.ply} />
-      <div className="game-log__body">
-        <button
-          type="button"
-          className="game-log__accepted"
-          onClick={() => dreamCount > 0 && setOpen((o) => !o)}
-          aria-expanded={open}
-          data-has-dreams={dreamCount > 0}
-        >
-          <span className="game-log__uci">
-            {woke ? entry.accepted : "never woke"}
-          </span>
-          {dreamCount > 0 && (
-            <span className="game-log__dream-badge">
-              {open ? "hide" : "see"} {dreamCount}{" "}
-              {dreamCount === 1 ? "dream" : "dreams"}
-            </span>
-          )}
-        </button>
-        {open && <DreamList attempts={entry.attempts} />}
-      </div>
-    </li>
-  );
-}
-
-function HumanEntry({ entry }) {
-  return (
-    <li className="game-log__entry game-log__entry--human">
-      <MoveNumber ply={entry.ply} />
-      <div className="game-log__body">
-        <span className="game-log__uci">{entry.uci}</span>
-      </div>
-    </li>
-  );
-}
-
-function GameLog({ entries }) {
-  return (
-    <section className="game-log" aria-label="Game record">
-      <h2 className="game-log__title">the record</h2>
-      {entries.length === 0 ? (
-        <p className="game-log__empty">Nothing has happened yet.</p>
+    <div className="log" ref={scrollRef} aria-label="Move log">
+      {empty ? (
+        <p className="log__empty">No moves yet</p>
       ) : (
-        <ol className="game-log__list">
-          {entries.map((entry) =>
-            entry.side === "model" ? (
-              <ModelEntry key={entry.ply} entry={entry} />
-            ) : (
-              <HumanEntry key={entry.ply} entry={entry} />
-            )
+        <ol className="log__list">
+          {entries.map((e) => {
+            const no = Math.ceil(e.ply / 2);
+            const isWhite = e.side !== "black";
+            return (
+              <li key={e.ply} className="log__line">
+                <span className="log__no">
+                  {no}
+                  {isWhite ? "." : "…"}
+                </span>
+                <span className="log__move">{e.uci}</span>
+                <span className="log__who">{isWhite ? "you" : "model"}</span>
+              </li>
+            );
+          })}
+          {thinking && (
+            <li className="log__line log__line--pending" aria-live="polite">
+              <span className="log__no">
+                {pendingNo}
+                {pendingIsWhite ? "." : "…"}
+              </span>
+              <span className="log__move log__dots">
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="log__who">model</span>
+            </li>
           )}
         </ol>
       )}
-    </section>
+    </div>
   );
 }
 
