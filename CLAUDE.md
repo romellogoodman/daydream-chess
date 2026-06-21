@@ -46,7 +46,8 @@ Python deps live in a venv at `.venv` (use `.venv/bin/python`, `.venv/bin/uvicor
 - Engine demo (headless, proves the loop & contract): `.venv/bin/python -m server.demo`
 - Engine server: `.venv/bin/uvicorn server.app:app --port 8000`
 - UI: `cd web && npm install && npm run dev` (port 8080; auto-falls back to **demo mode** if no server)
-- Full stack: start the engine on `:8000`, then the UI — it auto-connects.
+- Full stack (one command): `./run.sh` — starts the engine on `:8000`, waits for it, then opens the UI
+  on `:8080` connected live. Ctrl-C stops both; `OPEN=0 ./run.sh` skips opening the browser.
 
 When you change anything on the seam, verify it with a real WebSocket round-trip, not only unit tests.
 See `agent_docs/running.md`.

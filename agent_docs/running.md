@@ -4,6 +4,17 @@ Python deps are in a venv at the repo root: `.venv`. Invoke binaries directly
 (`.venv/bin/python`, `.venv/bin/uvicorn`, `.venv/bin/pip`) — there is no need to "activate" it.
 Node deps install under `web/node_modules`.
 
+## Full stack, one command
+
+```bash
+./run.sh            # engine on :8000, then UI on :8080 (live), opens the browser
+OPEN=0 ./run.sh     # same, but don't auto-open the browser
+```
+
+It runs `npm install` on first use, waits for the engine's `/health` before launching the UI (so the
+UI connects live rather than dropping into demo mode), and Ctrl-C stops both. The sections below cover
+running each half on its own.
+
 ## Engine (`server/`)
 
 ```bash
