@@ -27,15 +27,26 @@ Endpoint: `ws://localhost:8000/ws`. Every message is a JSON object with a `type`
 |---|---|---|
 | `new_game` | `temperature: number`, `cap: int` | Reset to the start position. Human=White, model=Black. |
 | `human_move` | `uci: string` | White's move, e.g. `"e2e4"`, promotion `"e7e8q"`. |
-| `set_controls` | `temperature: number`, `cap: int` | Update knobs for subsequent model turns. No reply. |
+| `set_controls` | `temperature: number`, `cap: int` | Update knobs for subsequent model turns. No reply. *(The v1 UI does not send this — it rolls random `temperature`/`cap` per game and passes them in `new_game`. The server still accepts it.)* |
 
 ### Server → Client
 | type | meaning |
 |---|---|
-| `state` | Full snapshot. Sent after `new_game` and after each accepted `human_move` (before the model turn). |
+| `state` | Full snapshot. Sent after `new_game`, after each accepted `human_move` (before the model turn), and **after the model turn** (handing the turn back to White) when the game continues. |
 | `move_rejected` | White's move was illegal (`{ uci }`); state does not advance, UI retries. |
 | `turn_record` | The model's (Black's) turn. The seam object — schema below. |
 | `game_over` | Terminal: `{ status, winner }`. `status: "sleep"` ⇔ model failed to wake. |
+
+**Message sequence for one full round** (human move → model reply):
+```
+human_move  ──►  state (turn: black)        # human's move applied
+            ──►  turn_record                # model's guesses + accepted move
+            ──►  state (turn: white)         # turn handed back, fresh legal_moves
+```
+That trailing `state` is required: the `turn_record` alone carries no `legal_moves`, so without it the
+UI has no legal moves for White and stays locked. If the model fails to wake, the `turn_record`
+(`woke: false`) is followed by `game_over` (`status: "sleep"`) instead of a `state`. If White's own move
+ends the game, the first `state` is followed directly by `game_over` and no model turn runs.
 
 `state` shape:
 ```jsonc
@@ -55,7 +66,9 @@ Endpoint: `ws://localhost:8000/ws`. Every message is a JSON object with a `type`
 
 ## The turn record (the seam object)
 
-One per model turn. The UI animates `attempts` in order: dreams, then (usually) the wake.
+One per model turn. The full vision animates `attempts` in order (dreams, then the wake). **The v1 UI
+ignores `attempts` and renders only `accepted`** — but the engine still emits the complete record, so
+the dream animation can be added later with no contract change.
 
 ```jsonc
 {

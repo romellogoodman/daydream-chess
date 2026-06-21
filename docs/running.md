@@ -54,22 +54,27 @@ Copy `web/.env.example` → `web/.env.local` to override.
 
 1. Start the engine: `.venv/bin/uvicorn server.app:app --port 8000`.
 2. Run a WebSocket round-trip and assert the message shapes match `architecture.md`
-   (`new_game` → `state`; `human_move` → `state` + `turn_record`; an illegal move → `move_rejected`).
-   A throwaway client using the `websockets` package (ships with `uvicorn[standard]`) is enough.
-3. Or: start the UI and play a move; confirm it is **not** in demo mode and the model dreams then wakes.
+   (`new_game` → `state`; `human_move` → `state(black)` + `turn_record` + `state(white)`; an illegal
+   move → `move_rejected`). A throwaway client using the `websockets` package (ships with
+   `uvicorn[standard]`) is enough.
+3. Or: start the UI and play a move; confirm it is **not** in demo mode (no banner) and the model
+   replies — board updates, the move log gains a `model` row, and the turn returns to you ("Your move").
 
 Unit tests alone do not prove the contract — the two halves were built independently against the spec,
-so the round-trip is the real check.
+so the round-trip is the real check. You can also drive the running UI with the Chrome DevTools MCP:
+squares are buttons with `aria-label` set to the square (e.g. `"e2"`), so clicking `e2` then `e4` plays
+a move.
 
-## Animation tuning (UI)
+## Tuning (UI)
 
-Per-step timings are named constants in `web/src/App.jsx` (`ANIM`): how long each dream board / ghost
-arrow is held, the settle gaps, the wake pause. Mock replay pacing is in `web/src/lib/socket.js`. The
-central dream→sharp CSS transition lives in `.board` in `web/src/App.scss`.
-
-> Note: at `temperature 0.8`, an opening turn can produce ~10+ dreams (high variance early). That is a
-> lot of animation time. Tune via the `MockProposer` base logits in `server/proposer.py` and/or the
-> `ANIM` hold durations if turns feel too long.
+- **Per-game params:** the UI rolls a random `temperature` (`0.5–1.1`) and `cap` (`16–36`) each game —
+  see `rollParams()` / the constants at the top of `web/src/App.jsx`.
+- **MockProposer behavior:** tune the base logits in `server/proposer.py` to change how many illegal
+  guesses precede a wake (higher temperature → more guesses, more risk of fail-to-wake).
+- **Demo replay pacing:** `MOCK_TURN_DELAY_MS` / `MOCK_STATE_DELAY_MS` in `web/src/lib/socket.js`.
+- The dream/wake **animation is not built in v1** (the UI renders only the accepted move). If it
+  returns, the per-step timing constants would live in `web/src/App.jsx` and the dream→sharp CSS on
+  `.board` in `web/src/App.scss`.
 
 ## Swapping in the real model (later)
 

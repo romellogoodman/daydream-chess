@@ -4,10 +4,15 @@ This is a React.js app with SCSS styles.
 
 ## File Structure
 
-- All React components should be placed in `src/App.jsx`
-- All styles should be placed in `src/App.scss`
+The prototype has outgrown the single-file boilerplate. Current layout:
 
-This single-file approach is intentional for rapid prototyping. Refactor into multiple files as the prototype grows.
+- `src/App.jsx` — orchestrator: game state, WS wiring, human input, new-game/params.
+- `src/components/` — `Board.jsx`, `GameLog.jsx` (and others as needed).
+- `src/lib/` — `socket.js` (real WS + demo `MockSocket`), `fixtures.js` (demo data), `chess.js`
+  (FEN parsing / square + piece helpers).
+- `src/App.scss` — styles (BEM, see below). `public/piece/cburnett/` holds the SVG piece set.
+
+Keep components small and focused; colocate a `.scss` per component if `App.scss` gets unwieldy.
 
 ## CSS/SCSS Conventions
 
