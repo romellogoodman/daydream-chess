@@ -25,7 +25,7 @@ function GameLog({ entries, thinking, nextPly }) {
         <ol className="log__list">
           {entries.map((e) => {
             const no = Math.ceil(e.ply / 2);
-            const isWhite = e.side !== "black";
+            const isWhite = e.side === "human"; // server sides are human|model
             return (
               <li key={e.ply} className="log__line">
                 <span className="log__no">
@@ -33,7 +33,11 @@ function GameLog({ entries, thinking, nextPly }) {
                   {isWhite ? "." : "…"}
                 </span>
                 <span className="log__move">{e.uci}</span>
-                <span className="log__who">{isWhite ? "you" : "model"}</span>
+                <img
+                  className="log__pawn"
+                  src={`/piece/cburnett/${isWhite ? "wP" : "bP"}.svg`}
+                  alt={isWhite ? "you" : "model"}
+                />
               </li>
             );
           })}
@@ -48,7 +52,11 @@ function GameLog({ entries, thinking, nextPly }) {
                 <i />
                 <i />
               </span>
-              <span className="log__who">model</span>
+              <img
+                className="log__pawn"
+                src="/piece/cburnett/bP.svg"
+                alt="model"
+              />
             </li>
           )}
         </ol>

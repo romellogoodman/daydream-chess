@@ -325,11 +325,13 @@ body {
     color: var(--c-ink);
   }
 
-  &__who {
-    color: var(--c-ink-faint);
-    font-family: var(--font-sans, inherit);
-    font-size: 0.68rem;
-    letter-spacing: 0.04em;
+  // white pawn = you, black pawn = model; faint halo keeps the black pawn
+  // readable on the dark panel
+  &__pawn {
+    width: 15px;
+    height: 15px;
+    justify-self: end;
+    filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, 0.5));
   }
 
   // pending model move: a loading row at the bottom of the log

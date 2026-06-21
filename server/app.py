@@ -38,7 +38,8 @@ def _game_over_msg(game: Game) -> dict | None:
 
 
 async def _run_model_turn(ws: WebSocket, game: Game) -> None:
-    """Compute Black's turn, send the turn_record, then game_over if it ended."""
+    """Compute Black's turn, send the turn_record, then either game_over or a
+    fresh state handing the turn back to White."""
     record = game.model_turn()
     await ws.send_json(record)
     over = _game_over_msg(game)
@@ -46,6 +47,9 @@ async def _run_model_turn(ws: WebSocket, game: Game) -> None:
         # sleep is sent AFTER the failing turn_record (handled here since the
         # record was just sent above).
         await ws.send_json(over)
+    else:
+        # Hand the turn back to White: the UI needs turn + fresh legal_moves.
+        await ws.send_json(game.state())
 
 
 @app.websocket("/ws")
