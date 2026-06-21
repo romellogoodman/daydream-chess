@@ -191,40 +191,35 @@ function App() {
         </div>
 
         <aside className="sidebar">
-          <button
-            type="button"
-            className="sidebar__new-game"
-            onClick={onNewGame}
-          >
-            New game
-          </button>
-          <StatusLine turn={turn} status={status} ending={ending} />
           <GameLog
             entries={history}
             thinking={thinking}
             nextPly={history.length + 1}
           />
-          <p className="sidebar__params">
-            temp {params.temperature.toFixed(2)} · cap {params.cap}
-          </p>
+          <div className="sidebar__status">
+            <p className="sidebar__meta">
+              {statusText({ turn, status, ending })} · temp{" "}
+              {params.temperature.toFixed(2)} · cap {params.cap}
+            </p>
+            <button
+              type="button"
+              className="sidebar__new-game"
+              onClick={onNewGame}
+            >
+              New game
+            </button>
+          </div>
         </aside>
       </div>
     </main>
   );
 }
 
-// A terse one-line status. Model "thinking" is shown in the log, not here.
-function StatusLine({ turn, status, ending }) {
-  let text;
-  if (ending) {
-    text = ENDINGS[ending.status] || "Game over";
-  } else if (status !== "playing") {
-    text = ENDINGS[status] || "Game over";
-  } else {
-    text = turn === "white" ? "Your move" : "";
-  }
-
-  return <p className="status-line">{text}</p>;
+// A terse turn label. Model "thinking" is shown in the log too.
+function statusText({ turn, status, ending }) {
+  if (ending) return ENDINGS[ending.status] || "Game over";
+  if (status !== "playing") return ENDINGS[status] || "Game over";
+  return turn === "white" ? "Your move" : "Thinking";
 }
 
 // Minimal terminal overlay with a quiet New game affordance.

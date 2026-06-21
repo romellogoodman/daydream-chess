@@ -64,7 +64,7 @@ body {
   // board + sidebar side by side, sized to content so they sit together
   &__layout {
     display: grid;
-    grid-template-columns: min(560px, 70vh) 260px;
+    grid-template-columns: min(560px, 70vh) 190px;
     gap: 0; // board and sidebar sit flush
     align-items: stretch;
 
@@ -93,12 +93,13 @@ body {
   padding: var(--sp-2);
 
   &__new-game {
+    align-self: flex-start;
     background: var(--c-accent);
     color: #fff;
     border: 0;
     border-radius: var(--r-soft);
-    padding: 10px;
-    font-size: 0.85rem;
+    padding: 5px 12px;
+    font-size: 0.74rem;
     cursor: pointer;
 
     &:hover {
@@ -223,15 +224,6 @@ body {
   }
 }
 
-// --- status line ----------------------------------------------------------
-.status-line {
-  margin: 0;
-  min-height: 1.2rem;
-  color: var(--c-ink-soft);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
-}
-
 // --- ending overlay -------------------------------------------------------
 .ending {
   position: absolute;
@@ -276,25 +268,30 @@ body {
   }
 }
 
-// --- params readout (footer of the sidebar; rolled each game) -------------
-.sidebar__params {
-  margin: 0;
-  margin-top: auto; // pin to the bottom of the sidebar
+// --- status footer (pinned to the bottom of the sidebar) ------------------
+.sidebar__status {
+  margin-top: auto; // push the info block to the bottom
   padding-top: var(--sp-2);
   border-top: 1px solid var(--c-panel-edge);
-  color: var(--c-ink-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+// turn · temp · cap, all on one compact line
+.sidebar__meta {
+  margin: 0;
+  color: var(--c-ink-soft);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
+  font-size: 0.68rem;
+  letter-spacing: 0.01em;
 }
 
 // --- move log (populates as the game runs) --------------------------------
 .log {
-  flex: 1; // fill the sidebar between status and controls
+  flex: 1; // fill the sidebar; moves at the top, status footer below
   min-height: 120px;
   overflow-y: auto;
-  border-top: 1px solid var(--c-panel-edge);
-  padding-top: var(--sp-1);
 
   &__empty {
     margin: 0;
